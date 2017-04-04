@@ -6,6 +6,7 @@ ENTRY=-main
 
 $(OUT): buildapp *.lisp quicklisp-manifest.txt
 	./buildapp  --manifest-file quicklisp-manifest.txt \
+				--compress-core \
 				--load-system asdf \
 				--eval '(push "$(ROOT_DIR)/" asdf:*central-registry*)' \
 				--load-system $(PACKAGE) \

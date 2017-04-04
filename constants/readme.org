@@ -1,0 +1,3 @@
+The wordlist contained in the file bonk.list is a concatenation of the
+non-acronym natural words in the moby word list and the list garnered at the
+repository held at [[git@github.com:fade/english-words.git] github english word list]
