@@ -36,7 +36,7 @@ is filled."
 
 (defvar *wordlist* 
   (read-clean-words
-   #P "/home/fade/SourceCode/lisp/english-words/long_word_list.txt"))
+   #P "/home/fade/SourceCode/lisp/cl-anagrams/constants/bonk.list"))
 
 (defun normalise-word (word)
   (sort (string-downcase word) #'char<))
