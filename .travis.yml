@@ -48,5 +48,5 @@ script:
   # prove-asdf must be independent.
   - ros +Q -e '(require "asdf")' -l prove-asdf.asd -e '(asdf:load-system :prove-asdf)'
   - ros -l cl-anagrams.asd -e '(ql:quickload :prove)'
-  - ros -l cl-anagrams-test.asd -e '(ql:quickload :cl-test-more)'
+  # - ros -l cl-anagrams-test.asd -e '(ql:quickload :cl-test-more)'
   - ros -e '(ql:quickload :prove) (uiop:quit (if (prove:run-test-system :cl-anagrams-test) 0 1))'
