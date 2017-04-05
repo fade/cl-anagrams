@@ -9,9 +9,11 @@
 (in-package :cl-anagrams)
 
 ;;; static system state
-(defvar *base-pathname* #.(uiop:pathname-directory-pathname (or *compile-file-truename* *load-truename*)))
+(defvar *base-pathname*
+  #.(uiop:pathname-directory-pathname (or *compile-file-truename* *load-truename*))
+  "we need this value to be calculated at run-time, not fixed at compile time.")
 
-(format t "~&The path is the way and the way is ~A" *base-pathname*)
+;; (format t "~&The path is the way and the way is ~A" *base-pathname*)
 
 (defun uniquify (wordlist)
   "we're misusing a hashtable here for the hash function's feature of flattening
