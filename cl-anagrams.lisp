@@ -18,11 +18,37 @@ is filled."
           do (setf (gethash word col) nil)
           finally (return (nreverse (alexandria:hash-table-keys col))))))
 
-(defun telebonk (wordlist)
+(defun telebonk (&optional (wordlist *wordlist*))
+  "Return a list of lists of each anagram."
   (loop for word in wordlist
         for targs = (lookup-word word)
         if targs
           :collect targs))
+
+(defun emit-anagrams (&optional (stream t) (wordlist *wordlist*))
+  "Write anagrams as lines of comma separated values to <stream>. Defaults to
+stdout."
+  (loop for word in wordlist
+        for ana = (lookup-word word)
+        if ana
+          do (format stream "~{~A~^, ~}~%" ana)))
+
+(defun emit-wordlist (&key (stream t) (wordlist *wordlist*))
+  "write the wordlist to <stream> as comma separated values. Defaults to
+  stdout"
+  (loop for count from 1 to (length wordlist)
+        for word in wordlist
+        when (= (mod count 9) 0)
+          do (format stream "~A, ~%" word)
+        else
+          do (format stream "~A, " word))
+  (finish-output))
+
+(defun dump-wordlist (filename &key (wordlist *wordlist*))
+  "Given a pathname and an optional list of words (defaults to *wordlist*),
+write the words to the pathname separated by commas."
+  (with-open-file (s filename :direction :output :if-exists :supersede)
+    (emit-wordlist :stream s :wordlist wordlist)))
 
 (defun read-clean-words (path)
   (let* ((tmpwords (rutils:split-string
@@ -34,9 +60,9 @@ is filled."
                           finally (return ham))))
     (uniquify testwords)))
 
-(defvar *wordlist* 
-  (read-clean-words
-   #P "/home/fade/SourceCode/lisp/cl-anagrams/constants/bonk.list"))
+(defparameter *wordlist* 
+  (sort (read-clean-words
+         #P "/home/fade/SourceCode/lisp/cl-anagrams/constants/bonk.list") #'string<))
 
 (defun normalise-word (word)
   (sort (string-downcase word) #'char<))

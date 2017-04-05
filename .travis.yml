@@ -26,10 +26,12 @@ addons:
     packages:
       # it is required for some reason
       # to install allegrocl and cmucl
-      - libc6-i386
+      # - libc6-i386
+      - libev-dev
 
 install:
   - curl -L https://raw.githubusercontent.com/snmsts/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
+  - ros install prove
 
 before_script:
   - ros --version
@@ -46,5 +48,5 @@ script:
   # prove-asdf must be independent.
   - ros +Q -e '(require "asdf")' -l prove-asdf.asd -e '(asdf:load-system :prove-asdf)'
   - ros -l cl-anagrams.asd -e '(ql:quickload :prove)'
-  - ros -l cl-test-more.asd -e '(ql:quickload :cl-test-more)'
-  - ros -e '(ql:quickload :prove) (uiop:quit (if (prove:run-test-system :prove-test) 0 1))'
+  - ros -l cl-anagrams-test.asd -e '(ql:quickload :cl-test-more)'
+  - ros -e '(ql:quickload :prove) (uiop:quit (if (prove:run-test-system :cl-anagrams-test) 0 1))'
