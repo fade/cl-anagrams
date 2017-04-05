@@ -8,12 +8,10 @@
 
 (plan nil)
 
-;; (ok (not (find 4 '(1 2 3))))
-;; (is 4 4)
-;; (isnt 1 #\1)
 
-(ok (= (length *wordlist*) 416111))
-(ok (= (length (rutils:hash-table-keys *anagrams*)) 357027))
-(ok (= (length (return-valid-anagrams *anagrams*)) 37775))
+;;; tests assume the default wordlist.
+(is (= (length *wordlist*) 416111))
+(is (= (length (rutils:hash-table-keys *anagrams*)) 357027))
+(is (= (length (return-valid-anagrams *anagrams*)) 37775))
 
 (finalize)
