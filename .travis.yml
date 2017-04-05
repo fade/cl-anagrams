@@ -10,6 +10,7 @@ env:
     - LISP=sbcl-bin
     - LISP=ccl-bin
     - LISP=clisp
+    = LISP=allegro
     # - LISP=ecl
     # - LISP=abcl
     # - LISP=allegro
