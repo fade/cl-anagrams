@@ -8,6 +8,11 @@
 
 (in-package :cl-anagrams)
 
+;;; static system state
+(defvar *base-pathname* #.(uiop:pathname-directory-pathname (or *compile-file-truename* *load-truename*)))
+
+(format t "~&The path is the way and the way is ~A" *base-pathname*)
+
 (defun uniquify (wordlist)
   "we're misusing a hashtable here for the hash function's feature of flattening
 duplicate values in its keyspace very quickly. By creating it equal to the
@@ -62,7 +67,7 @@ write the words to the pathname separated by commas."
 
 (defparameter *wordlist* 
   (sort (read-clean-words
-         #P "/home/fade/SourceCode/lisp/cl-anagrams/constants/bonk.list") #'string<))
+         (merge-pathnames "constants/bonk.list" *base-pathname*)) #'string<))
 
 (defun normalise-word (word)
   (sort (string-downcase word) #'char<))
