@@ -4,7 +4,22 @@
             ;; (:use #:alexandria #:rutils)
             (:use #:cl-anagrams.app-utils
                   #:net.didierverna.clon)
-            (:export :-main))
+            (:export :-main
+                     :*base-pathname*
+                     :uniquify
+                     :emit-anagrams
+                     :emit-wordlist
+                     :dump-wordlist
+                     :read-clean-words
+                     :*wordlist*
+                     :normalise-word
+                     :build-anagram-hash-table
+                     :*anagrams*
+                     :print-anagrams-as-text
+                     :print-anagram-dictionary
+                     :return-valid-anagrams
+                     :output-file-of-anagrams
+                     :lookup-word))
 
 (in-package :cl-anagrams)
 
@@ -86,6 +101,7 @@ write the words to the pathname separated by commas."
 
 (defvar *anagrams* (make-hash-table :test #'equal))
 
+;;; all side effects, all the time. This should be a setf expander.
 (build-anagram-hash-table *anagrams* *wordlist*)
 
 (defun print-anagrams-as-text (&optional (anagram-t *anagrams*))
