@@ -13,7 +13,7 @@
 ;; (isnt 1 #\1)
 
 (ok (= (length *wordlist*) 416111))
-(ok (= (hash-table-size *anagrams*) 524288))
+(ok (= (length (rutils:hash-table-keys *anagrams*)) 357027))
 (ok (= (length (return-valid-anagrams *anagrams*)) 37775))
 
 (finalize)
