@@ -9,7 +9,7 @@ env:
   matrix:
     - LISP=sbcl-bin
     - LISP=ccl-bin
-    = LISP=allegro
+    - LISP=allegro
     # - LISP=ecl
     # - LISP=abcl
     # - LISP=cmucl
