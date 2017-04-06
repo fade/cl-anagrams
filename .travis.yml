@@ -9,7 +9,7 @@ env:
   matrix:
     - LISP=sbcl-bin
     - LISP=ccl-bin
-    = LISP=allegro
+    - LISP=allegro
     # - LISP=ecl
     # - LISP=abcl
     # - LISP=cmucl
@@ -32,7 +32,7 @@ addons:
 install:
   - curl -L https://raw.githubusercontent.com/snmsts/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
   - ros install prove
-  = ros install asdf
+  - ros install asdf
 
 before_script:
   - ros --version
