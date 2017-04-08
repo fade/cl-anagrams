@@ -5,6 +5,7 @@
                :alexandria
                :fare-csv
                :rutils
+               :uiop
                :cl-anagrams)
   :components ((:module "t"
                         :serial t
