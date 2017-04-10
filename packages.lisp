@@ -24,9 +24,11 @@
                      :output-file-of-anagrams
                      :lookup-word))
 
-
-(defpackage :cl-anagrams.app-utils
-  (:use :cl)
-  (:export :internal-disable-debugger)
-  (:export :internal-quit))
+(defpackage :cl-anagrams.web
+  (:use :cl
+        :cl-who
+        :parenscript
+        :hunchentoot
+        :cl-anagrams)
+  (:export :start-anagrams))
 

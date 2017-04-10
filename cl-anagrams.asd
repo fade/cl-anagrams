@@ -6,13 +6,17 @@
   :license "Modified BSD License"
   :serial t
   :in-order-to ((test-op (test-op cl-anagrams-test)))
-  :depends-on (:ALEXANDRIA
-               :RUTILS
-               :FARE-CSV
-               :NET.DIDIERVERNA.CLON
-               :HUNCHENTOOT
-               :PARENSCRIPT
-               :CL-WHO)
+  :depends-on (:alexandria
+               :rutils
+               :inferior-shell
+               :fare-csv
+               :net.didierverna.clon
+               :hunchentoot
+               :parenscript
+               :cl-css
+               :cl-who
+               :cl-json
+               :drakma)
   ;; :pathname "./"
   :components ((:file "packages")
                (:file "app-utils" :depends-on ("packages"))

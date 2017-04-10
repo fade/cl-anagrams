@@ -3,9 +3,11 @@
   :license "Modified BSD License"
   :depends-on (:prove
                :alexandria
+               :inferior-shell
                :fare-csv
                :rutils
                :uiop
+               :drakma
                :cl-anagrams)
   :components ((:module "t"
                         :serial t
