@@ -19,10 +19,8 @@
 ;; :*wordlist*
 ;; :normalise-word
 ;; :build-anagram-hash-table
-;; :*anagrams*
-;; :print-anagrams-as-text
-;; :print-anagram-dictionary
-;; :return-valid-anagrams
+;x; :*anagrams*
+;x; :return-valid-anagrams
 ;; :output-file-of-anagrams
 ;; :lookup-word
 
@@ -39,5 +37,13 @@
 ;3; check that the valid anagrams inside the table contains the expected words
 ;given the default wordlist.
 (ok (= (length (return-valid-anagrams *anagrams*)) 37775))
+
+;4; check that lookup-word is returning expected results
+(ok (= (+ (length (lookup-word "poesis"))
+           (length (lookup-word "heart"))) 18))
+
+;5; known anagrams in our hashtable.
+(ok (and (find "thera" (lookup-word "heart") :test #'string=)
+         (find "posies" (lookup-word "poesis" :test #'string=))))
 
 (finalize)
