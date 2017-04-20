@@ -6,20 +6,12 @@
   #.(uiop:pathname-directory-pathname (or *compile-file-truename* *load-truename*))
   "we need this value to be calculated at run-time, not fixed at compile time.")
 
-;; (format t "~&The path is the way and the way is ~A" *base-pathname*)
-
-(defun uniquify (wordlist)
-  "we're misusing a hashtable here for the hash function's feature of flattening
-duplicate values in its keyspace very quickly. By creating it equal to the
-length of the input, we ensure that the table never has to be rehashed while it
-is filled."
-  (let ((col (make-hash-table :size (length wordlist) :test #'equal)))
-    (loop for word in wordlist
-          do (setf (gethash word col) nil)
-          finally (return (nreverse (alexandria:hash-table-keys col))))))
+;;; output our metadata in various ways.
 
 (defun telebonk (&optional (wordlist *wordlist*))
   "Return a list of lists of each anagram."
+  (princ "HELLO FROM EMACS!")
+  (terpri)
   (loop for word in wordlist
         for targs = (lookup-word word)
         if targs
@@ -50,7 +42,26 @@ write the words to the pathname separated by commas (CSV)."
   (with-open-file (s filename :direction :output :if-exists :supersede)
     (emit-wordlist :stream s :wordlist wordlist)))
 
+(defun print-anagrams-as-text (&optional (anagram-t *anagrams*))
+  "print to standard output a comma separated list of each anagram tuple we have
+recorded, with tuples separated by newlines."
+  (loop for words in (return-valid-anagrams anagram-t)
+        do (format t "~&~{~A~^, ~}" words)))
+
+;;; /metadata
+
+(defun uniquify (wordlist)
+  "we're misusing a hashtable here for the hash function's feature of flattening
+duplicate values in its keyspace very quickly. By creating it equal to the
+length of the input, we ensure that the table never has to be rehashed while it
+is filled."
+  (let ((col (make-hash-table :size (length wordlist) :test #'equal)))
+    (loop for word in wordlist
+          do (setf (gethash word col) nil)
+          finally (return (nreverse (alexandria:hash-table-keys col))))))
+
 (defun read-clean-words (path)
+  "read in a file of words from <path>."
   (let* ((tmpwords (rutils:split-string
                     (alexandria:read-file-into-string
                      path)))
@@ -65,6 +76,7 @@ write the words to the pathname separated by commas (CSV)."
          (merge-pathnames "constants/bonk.list" *base-pathname*)) #'string<))
 
 (defun normalise-word (word)
+  "return word as a string downcased and sorted alphabetically."
   (sort (string-downcase word) #'char<))
 
 (defun build-anagram-hash-table (agram-t wordlist)
@@ -79,14 +91,9 @@ write the words to the pathname separated by commas (CSV)."
 
 (defvar *anagrams* (make-hash-table :test #'equal))
 
-;;; all side effects, all the time. This should be a setf expander.
+;;; all side effects, all the time. After this point, we have precalculated all the
+;;; anagrams that are contained in our wordlist.
 (build-anagram-hash-table *anagrams* *wordlist*)
-
-(defun print-anagrams-as-text (&optional (anagram-t *anagrams*))
-  "print to standard output a comma separated list of each anagram tuple we have
-recorded, with tuples separated by newlines."
-  (loop for words in (return-valid-anagrams anagram-t)
-        do (format t "~&~{~A~^, ~}" words)))
 
 
 
@@ -153,8 +160,7 @@ word."
                  ;; :argument-type "ANAGRAMS"
                  :default-value "/tmp/anagrams.csv")
          (stropt :short-name "j" :long-name "wjson"
-                 :description "Dump the wordlist as a JSON formatted string to
-                 stdout."
+                 :description "Dump the wordlist as a JSON formatted string to file."
                  :argument-name "JSON"
                  :default-value "/tmp/anagrams.json")))
 
@@ -183,10 +189,10 @@ word."
              ;; we don't want the web server to exit immediately, so join it to
              ;; this execution context
              (sb-thread:join-thread (find-if
-                                     (lambda (th)
-                                       (string= (sb-thread:thread-name th)
-                                                (format nil "hunchentoot-listener-*:~A" port)))
-                                     (sb-thread:list-all-threads)))))
+                                           (lambda (th)
+                                             (string= (sb-thread:thread-name th)
+                                                      (format nil "hunchentoot-listener-*:~A" port)))
+                                           (sb-thread:list-all-threads)))))
           
           ((or (string= name "d") (string= name "dict")))
           
@@ -203,6 +209,11 @@ word."
                               :if-does-not-exist :create)
              (emit-anagrams :stream f)
              (format t "~&File output to: ~A~%" value)))
+          ((or (string= name "j") (string= name "wjson"))
+           (with-open-file (f value :direction :output
+                              :if-exists :supersede
+                              :if-does-not-exist :create)
+             (cl-json:encode-json *anagrams* f)))
           
           (t
            (format t "~&~A has ~D, which are~%~{~A~^, ~}~%" word (length anagrams) anagrams)))))

@@ -8,9 +8,6 @@ env:
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
   matrix:
     - LISP=sbcl-bin
-    - LISP=ccl-bin
-    - LISP=ecl
-    - LISP=abcl
 
 matrix:
   allow_failures:
@@ -18,6 +15,9 @@ matrix:
     # roswell installs ASDF3, but clisp doesn't see it
     - env: LISP=clisp
     - env: LISP=ecl
+    - env: LISP=ccl-bin
+    - env: LISP=ecl
+    - env: LISP=abcl
 
 addons:
   apt:

@@ -8,6 +8,7 @@
   :in-order-to ((test-op (test-op cl-anagrams-test)))
   :depends-on (:alexandria
                :rutils
+               :bordeaux-threads
                :inferior-shell
                :fare-csv
                :net.didierverna.clon
