@@ -16,10 +16,12 @@
                :cl-css
                :cl-who
                :cl-json
-               :drakma)
+               :drakma
+               :swank)
   ;; :pathname "./"
   :components ((:file "packages")
                (:file "app-utils" :depends-on ("packages"))
+               (:file "random-toy-functions" :depends-on ("packages"))
                (:file "web" :depends-on ("packages"))
                (:file "cl-anagrams" :depends-on ("packages"))))
 

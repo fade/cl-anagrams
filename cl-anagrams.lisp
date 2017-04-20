@@ -25,7 +25,7 @@ is filled."
         if targs
           :collect targs))
 
-(defun emit-anagrams (&optional (stream t) (wordlist *wordlist*))
+(defun emit-anagrams (&key (stream t) (wordlist *wordlist*))
   "Write anagrams as lines of comma separated values to <stream>. Defaults to
 stdout."
   (loop for word in wordlist
@@ -89,25 +89,26 @@ recorded, with tuples separated by newlines."
         do (format t "~&~{~A~^, ~}" words)))
 
 
-;;; these were largely used for development testing.
-(defun print-anagram-dictionary (agram-t &optional (stream t))
-  (loop for k being the hash-keys in agram-t using (hash-value v)
-        if (> (length v) 1)
-          counting k
-          do (format stream "~&~A || ~S" k v)))
 
-(defun return-valid-anagrams (agram-t)
-  (loop for k being the hash-keys in agram-t using (hash-value v)
-        if (> (length v) 1)
-          collect v into stuff
-        finally (return stuff)))
+;;; return the largest anagram set in our data
+(defun largest-anagram-set (&optional (anagrams *anagrams*))
+  "return the largest set of anagrams in the hashtable passed in as 'anagrams."
+  (let* ((anas (return-valid-anagrams anagrams))
+         (maxlen (loop for x in anas maximize (list-length x))))
+    (find maxlen anas :key #'list-length :test 'equalp)))
 
-(defun output-file-of-anagrams (agram-t &optional (filename #P "/tmp/anagrams.txt"))
-  (with-open-file (s filename :direction :output :if-exists :supersede)
-    (let ((words agram-t))
-      (loop for slice in words
-            do (format s "~&~A || ~{~A~^, ~}" (first slice) (rest slice))))))
-;;; /development testing.
+(defun anagram-frequencies-for-n (n anagrams)
+  ""
+  (let* ((anas (return-valid-anagrams anagrams)))
+    (loop for x in anas
+          when (= (length x) n)
+            collect x)))
+
+(defun anagram-frequency-map (anagrams)
+  (loop for i from 1 to 25
+        for anas = (anagram-frequencies-for-n i anagrams)
+        if anas
+          collect (cons i (list anas))))
 
 ;;; this is the primary entry to the angram database.
 (defun lookup-word (word &optional (agram-t *anagrams*) (test nil))
@@ -132,8 +133,13 @@ word."
          (flag :short-name "v" :long-name "version"
                :description "Print version number and exit."))
   (group (:header "Managing working dictionary")
-         (flag :short-name "s" :long-name "stdout"
-               :description "Force dictionary commands to output to standard out")
+         ;; (flag :short-name "s" :long-name "stdout"
+         ;;       :description "Force dictionary commands to output to standard out")
+         ;; (flag :short-name "l" :long-name "localhost"
+         ;;       :description "Bind the webserver to localhost.")
+         (stropt :short-name "t" :long-name "http"
+                 :description "Start up a webserver for anagram requests on the supplied port."
+                 :default-value "8888")
          (stropt :short-name "d" :long-name "dict"
                  :description "Load a custom dictionary on top of the built in wordlist."
                  :argument-name "DICT"
@@ -152,14 +158,10 @@ word."
                  :argument-name "JSON"
                  :default-value "/tmp/anagrams.json")))
 
-(defmacro standard-opts-with-exit (s l &body body)
-  `(or (string= ,s) (string= ,l)
-       ,@body
-       (uiop:quit 0)))
-
 (defun -main (argv)
   "Entry point for the anagram discovery tool."
   (make-context)
+  (defparameter *anagram-server* nil)
   ;; (format t "~& ~D ARGV :: ~{~A~^ ~}~%" (length argv) argv)
   (net.didierverna.clon:do-cmdline-options (option name value source)
     (cond ((or (string= name "h") (string= name "help"))
@@ -167,25 +169,41 @@ word."
            (help)
            (terpri)
            (uiop:quit 0))
-          ;; ((standard-opts-with-exit "v" "version" (format t "~&~A~%" "0.0.1")))
+          
           ((or (string= name "v") (string= name "version"))
            (terpri)
            (format t "~A~%" "0.0.1")
            (uiop:quit 0))
+
+          ((or (string= name "t") (string= name "http"))
+           (setf swank::*loopback-interface* "127.0.0.1")
+           (swank:create-server :port 4007 :style :spawn :dont-close t )
+           (let ((port (parse-integer value :junk-allowed t)))
+             (setf *anagram-server*  (cl-anagrams.web:start-anagrams :port port))
+             ;; we don't want the web server to exit immediately, so join it to
+             ;; this execution context
+             (sb-thread:join-thread (find-if
+                                     (lambda (th)
+                                       (string= (sb-thread:thread-name th)
+                                                (format nil "hunchentoot-listener-*:~A" port)))
+                                     (sb-thread:list-all-threads)))))
+          
           ((or (string= name "d") (string= name "dict")))
+          
           ((or (string= name "w") (string= name "wfile"))
            (with-open-file (f value :direction :output
                                     :if-exists :supersede
                                     :if-does-not-exist :create)
              (emit-wordlist :stream f)
              (format t "~&File output to: ~A~%" value)))
+          
           ((or (string= name "a") (string= name "anagrams"))
            (with-open-file (f value :direction :output
                               :if-exists :supersede
                               :if-does-not-exist :create)
              (emit-anagrams :stream f)
              (format t "~&File output to: ~A~%" value)))
-          ((or (string=)))
+          
           (t
            (format t "~&~A has ~D, which are~%~{~A~^, ~}~%" word (length anagrams) anagrams)))))
 

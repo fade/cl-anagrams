@@ -40,9 +40,13 @@
 
 ;; ;4; check that lookup-word is returning expected results
 (ok (= 18 (+ (length (lookup-word "poesis")) (length (lookup-word "heart")))))
+(is 18 (+ (length (lookup-word "poesis")) (length (lookup-word "heart"))))
 
-;5; known anagrams in our hashtable.
+;5; known anagrams in our set.
 (ok (and (find "thera" (lookup-word "heart") :test #'string-equal)
          (find "posies" (lookup-word "poesis") :test #'string-equal)))
+
+;6; largest anagram in our set.
+
 
 (finalize)
