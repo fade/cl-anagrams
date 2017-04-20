@@ -27,3 +27,21 @@
        ,@body
        (uiop:quit 0)))
 
+
+;;; portable and sbcl specific thread management functions
+
+(defun blag (p)
+  (let ((port p))
+    (find-if
+     (lambda (th)
+       (string= (bordeaux-threads:thread-name th)
+                (format nil "hunchentoot-listener-*:~A" port)))
+     (bordeaux-threads:all-threads))))
+
+(defun boog (p)
+  (let ((port p))
+    (find-if
+     (lambda (th)
+       (string= (sb-thread:thread-name th)
+                (format nil "hunchentoot-listener-*:~A" port)))
+     (sb-thread:list-all-threads))))

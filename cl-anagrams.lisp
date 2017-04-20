@@ -189,10 +189,10 @@ word."
              ;; we don't want the web server to exit immediately, so join it to
              ;; this execution context
              (sb-thread:join-thread (find-if
-                                           (lambda (th)
-                                             (string= (sb-thread:thread-name th)
-                                                      (format nil "hunchentoot-listener-*:~A" port)))
-                                           (sb-thread:list-all-threads)))))
+                                     (lambda (th)
+                                       (string= (sb-thread:thread-name th)
+                                                (format nil "hunchentoot-listener-*:~A" port)))
+                                     (sb-thread:list-all-threads)))))
           
           ((or (string= name "d") (string= name "dict")))
           
