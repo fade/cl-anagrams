@@ -39,10 +39,10 @@
 (ok (= (length (return-valid-anagrams *anagrams*)) 37775))
 
 ;; ;4; check that lookup-word is returning expected results
-;; (ok (= 18 (+ (length (lookup-word "poesis")) (length (lookup-word "heart")))))
+(ok (= 18 (+ (length (lookup-word "poesis")) (length (lookup-word "heart")))))
 
-;; ;5; known anagrams in our hashtable.
-;; (ok (and (find "thera" (lookup-word "heart") :test #'string=)
-;;          (find "posies" (lookup-word "poesis" :test #'string=))))
+;5; known anagrams in our hashtable.
+(ok (and (find "thera" (lookup-word "heart") :test #'string-equal)
+         (find "posies" (lookup-word "poesis") :test #'string-equal)))
 
 (finalize)
