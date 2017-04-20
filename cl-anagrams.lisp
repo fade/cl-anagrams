@@ -30,7 +30,7 @@ is filled."
 stdout."
   (loop for word in wordlist
         for ana = (lookup-word word)
-        if ana
+        if (and ana (> (length ana) 1))
           do (format stream "~{~A~^, ~}~%" ana)))
 
 (defun emit-wordlist (&key (stream t) (wordlist *wordlist*))
@@ -39,14 +39,14 @@ stdout."
   (loop for count from 1 to (length wordlist)
         for word in wordlist
         when (= (mod count 9) 0)
-          do (format stream "~A, ~%" word)
+          do (format stream "~A,~%" word)
         else
           do (format stream "~A, " word))
   (finish-output))
 
 (defun dump-wordlist (filename &key (wordlist *wordlist*))
   "Given a pathname and an optional list of words (defaults to *wordlist*),
-write the words to the pathname separated by commas."
+write the words to the pathname separated by commas (CSV)."
   (with-open-file (s filename :direction :output :if-exists :supersede)
     (emit-wordlist :stream s :wordlist wordlist)))
 
@@ -88,6 +88,8 @@ recorded, with tuples separated by newlines."
   (loop for words in (return-valid-anagrams anagram-t)
         do (format t "~&~{~A~^, ~}" words)))
 
+
+;;; these were largely used for development testing.
 (defun print-anagram-dictionary (agram-t &optional (stream t))
   (loop for k being the hash-keys in agram-t using (hash-value v)
         if (> (length v) 1)
@@ -105,45 +107,86 @@ recorded, with tuples separated by newlines."
     (let ((words agram-t))
       (loop for slice in words
             do (format s "~&~A || ~{~A~^, ~}" (first slice) (rest slice))))))
+;;; /development testing.
 
+;;; this is the primary entry to the angram database.
 (defun lookup-word (word &optional (agram-t *anagrams*) (test nil))
   "given a word and a hash table of anagrams, return any anagrams for the given
-word contained in the built in dictionary."
+word."
   (let ((normalized-word (sort (string-downcase word) #'char<)))
     (multiple-value-bind (k p) (gethash normalized-word agram-t)
       ;; (format t "[[~{~A~^ ~}]]" k)
       (cond ((and p (> (length k) 1))
              (if test
-                 (format t "~&~{~A~^ ~}~%" k))
-             k)
+                 (format t "~&~{~A~^ ~}~%" k)
+                 k))
             (t nil)))))
 
-
 ;; CLON setup
-(defsynopsis (:postfix "WORDS ...")
-  (text :contents "A tool for anagram discovery. Base dictionary preloaded")
+(defsynopsis (:postfix "Word..")
+  (text :contents "A tool for anagram discovery. Base dictionary preloaded, and
+  resident.")
   (group (:header "Immediate exit options:")
          (flag :short-name "h" :long-name "help"
                :description "Print this help and exit.")
          (flag :short-name "v" :long-name "version"
                :description "Print version number and exit."))
   (group (:header "Managing working dictionary")
-         (flag :short-name "d" :long-name "dict"
-               :description "Load a custom dictionary on top of the built in wordlist.")
-         (flag :short-name "w" :long-name "wfile"
-               :description "Dump the wordlist to a comma separated file.
-               Defaults to /tmp/wordlist.txt")
-         (flag :short-name "j" :long-name "wjson"
-               :description "Dump the wordlist as a JSON formatted string to
-               stdout.")))
+         (flag :short-name "s" :long-name "stdout"
+               :description "Force dictionary commands to output to standard out")
+         (stropt :short-name "d" :long-name "dict"
+                 :description "Load a custom dictionary on top of the built in wordlist."
+                 :argument-name "DICT"
+                 :default-value "static/bonk.list")
+         (stropt :short-name "w" :long-name "wfile"
+                 :description "Dump the wordlist to a comma separated file.
+                 Defaults to /tmp/wordlist.txt"
+                 :argument-name "WLIST"
+                 :default-value "/tmp/wordlist.list")
+         (stropt :short-name "a" :long-name "anagrams"
+                 ;; :argument-type "ANAGRAMS"
+                 :default-value "/tmp/anagrams.csv")
+         (stropt :short-name "j" :long-name "wjson"
+                 :description "Dump the wordlist as a JSON formatted string to
+                 stdout."
+                 :argument-name "JSON"
+                 :default-value "/tmp/anagrams.json")))
 
+(defmacro standard-opts-with-exit (s l &body body)
+  `(or (string= ,s) (string= ,l)
+       ,@body
+       (uiop:quit 0)))
 
 (defun -main (argv)
   "Entry point for the anagram discovery tool."
   (make-context)
-  (format t "~& ~D ARGV :: ~{~A~^ ~}~%" (length argv) argv)
-  (let* ((word (second argv))
-         (anagrams (lookup-word word)))
-    (format t "~&~A has ~D, which are~%~{~A~^, ~}~%" word (length anagrams) anagrams)))
+  ;; (format t "~& ~D ARGV :: ~{~A~^ ~}~%" (length argv) argv)
+  (net.didierverna.clon:do-cmdline-options (option name value source)
+    (cond ((or (string= name "h") (string= name "help"))
+           (terpri)
+           (help)
+           (terpri)
+           (uiop:quit 0))
+          ;; ((standard-opts-with-exit "v" "version" (format t "~&~A~%" "0.0.1")))
+          ((or (string= name "v") (string= name "version"))
+           (terpri)
+           (format t "~A~%" "0.0.1")
+           (uiop:quit 0))
+          ((or (string= name "d") (string= name "dict")))
+          ((or (string= name "w") (string= name "wfile"))
+           (with-open-file (f value :direction :output
+                                    :if-exists :supersede
+                                    :if-does-not-exist :create)
+             (emit-wordlist :stream f)
+             (format t "~&File output to: ~A~%" value)))
+          ((or (string= name "a") (string= name "anagrams"))
+           (with-open-file (f value :direction :output
+                              :if-exists :supersede
+                              :if-does-not-exist :create)
+             (emit-anagrams :stream f)
+             (format t "~&File output to: ~A~%" value)))
+          ((or (string=)))
+          (t
+           (format t "~&~A has ~D, which are~%~{~A~^, ~}~%" word (length anagrams) anagrams)))))
 
 

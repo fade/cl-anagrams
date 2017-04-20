@@ -59,7 +59,9 @@ emit."
       (format t "~{~A~^, ~}" glist)
       (standard-page
           (:title "Anagram results")
-        (:h1 (str (format nil "~S has the following anagrams:" word)))
+        (:h1 (if glist
+                 (str (format nil "~S is in the set of the following anagrams:" word))
+                 (str (format nil "~s does not have any anagrams." word))))
         (:div :id "chart"
               (:ol
                (dolist (w glist)
