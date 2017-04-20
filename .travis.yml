@@ -16,7 +16,8 @@ matrix:
   allow_failures:
     # there is some issue with clisp,
     # roswell installs ASDF3, but clisp doesn't see it
-    # - env: LISP=clisp
+    - env: LISP=clisp
+    - env: LISP=ecl
 
 addons:
   apt:
