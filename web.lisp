@@ -28,15 +28,7 @@ emit."
                    :align "right"
                    (:img :src "img/made-with-lisp-logo.png"))))))
 
-(defun top-page ()
-  (standard-page (:title "Anagram Explorer")
-    (:h1 "Explore a wide array of Anagrams...")
-    (:p "Write this code in the future.")))
-
 ;;;; Setup the page handlers for the application
-
-;; (define-easy-handler (anagrams :uri "/") ()
-;;   (top-page))
 
 (hunchentoot:define-easy-handler (say-yo :uri "/yo") (name)
   (setf (hunchentoot:content-type*) "text/plain")
@@ -48,6 +40,7 @@ emit."
 (define-easy-handler (lookup :uri "/") ()
   (standard-page (:title "Lookup up any potential anagrams of a word")
     (:h1 "Lookup anagrams of a given word")
+    (:h3 "Enter one word at a time, only the alphabetic characters a &rarr; z are accepted.")
     (:form :action "/lword" :method "post" :id "lookup"
            (:p "What is the word?" (:br)
                (:input :type "text" :name "word" :class "txt"))
