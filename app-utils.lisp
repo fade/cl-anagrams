@@ -5,7 +5,14 @@
 ;;   (:export :internal-quit))
 
 (in-package :cl-anagrams.app-utils)
-  
+
+(defun strip-string (string)
+  (string-trim " ^M^Z" string))
+
+(defun strip-spaces (string-list)
+  (mapcar #'strip-string string-list))
+
+
 (defun internal-disable-debugger ()
   (labels
       ((internal-exit (c h)

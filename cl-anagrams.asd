@@ -30,5 +30,7 @@
 (defpackage :cl-anagrams.app-utils
   (:use :cl)
   (:export :internal-disable-debugger)
-  (:export :internal-quit))
+  (:export :internal-quit
+           :strip-string
+           :strip-spaces))
 
