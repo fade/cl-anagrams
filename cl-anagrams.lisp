@@ -144,7 +144,7 @@ word."
                :description "Print version number and exit."))
   (group (:header "Managing working dictionary")
          ;; (flag :short-name "s" :long-name "stdout"
-         ;;       :description F"orce dictionary commands to output to standard out")
+         ;;       :description "Force dictionary commands to output to standard out")
          ;; (flag :short-name "l" :long-name "localhost"
          ;;       :description "Bind the webserver to localhost.")
          (stropt :short-name "t" :long-name "http"
