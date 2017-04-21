@@ -125,7 +125,6 @@ word."
           (strip-string
            (substitute-if-not #\Space #'alpha-char-p
                               (sort (string-downcase word) #'char<)))))
-
     (multiple-value-bind (k p) (gethash normalized-word agram-t)
       ;; (format t "[[~{~A~^ ~}]]" k)
       (cond ((and p (> (length k) 1))

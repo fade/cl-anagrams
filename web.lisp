@@ -38,7 +38,7 @@ emit."
 ;;     (standard-page))
 
 (define-easy-handler (lookup :uri "/") ()
-  (standard-page (:title "Lookup up any potential anagrams of a word")
+  (standard-page (:title "Lookup any potential anagrams of a word")
     (:h1 "Lookup anagrams of a given word")
     (:h3 "Enter one word at a time, only the alphabetic characters a &rarr; z are accepted.")
     (:form :action "/lword" :method "post" :id "lookup"
