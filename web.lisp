@@ -21,8 +21,9 @@ emit."
                    (:img :src "static/logo.png"
                          :alt "logo image"
                          :class "logo")
-                   (:span :class "strapline"
-                          "Anagrams are interesting!"))
+                   ;; (:span :class "strapline"
+                   ;;        "Anagrams are interesting!")
+                   )
              ,@body
              (:div :id "footer"
                    :align "right"
