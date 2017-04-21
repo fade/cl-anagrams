@@ -121,7 +121,11 @@ is filled."
 (defun lookup-word (word &optional (agram-t *anagrams*) (test nil))
   "given a word and a hash table of anagrams, return any anagrams for the given
 word."
-  (let ((normalized-word (sort (string-downcase word) #'char<)))
+  (let ((normalized-word
+          (strip-string
+           (substitute-if-not #\Space #'alpha-char-p
+                              (sort (string-downcase word) #'char<)))))
+
     (multiple-value-bind (k p) (gethash normalized-word agram-t)
       ;; (format t "[[~{~A~^ ~}]]" k)
       (cond ((and p (> (length k) 1))
@@ -141,7 +145,7 @@ word."
                :description "Print version number and exit."))
   (group (:header "Managing working dictionary")
          ;; (flag :short-name "s" :long-name "stdout"
-         ;;       :description "Force dictionary commands to output to standard out")
+         ;;       :description F"orce dictionary commands to output to standard out")
          ;; (flag :short-name "l" :long-name "localhost"
          ;;       :description "Bind the webserver to localhost.")
          (stropt :short-name "t" :long-name "http"
