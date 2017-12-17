@@ -38,6 +38,7 @@
                 (format nil "hunchentoot-listener-*:~A" port)))
      (bordeaux-threads:all-threads))))
 
+#+SBCL
 (defun boog (p)
   (let ((port p))
     (find-if
