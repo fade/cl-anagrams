@@ -43,6 +43,5 @@ before_script:
             (princ *features*)
             (terpri)'
 
-
 script:
   - ros -s prove -e '(or (prove:run :cl-anagrams-test) (uiop:quit -1))'
