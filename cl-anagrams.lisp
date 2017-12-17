@@ -18,8 +18,7 @@
           :collect targs))
 
 (defun emit-anagrams (&key (stream t) (wordlist *wordlist*))
-  "Write anagrams as lines of comma separated values to <stream>. Defaults to
-stdout."
+  "Write anagrams as lines of comma separated values to <stream>. Defaults to stdout."
   (loop for word in wordlist
         for ana = (lookup-word word)
         if (and ana (> (length ana) 1))
@@ -82,7 +81,7 @@ is filled."
 (defun build-anagram-hash-table (agram-t wordlist)
   "intern anagrams in a normalised hash-table."
   (loop for word in wordlist
-        for normal = (sort (string-downcase word) #'char<)
+        for normal = (normalise-word word) ;; (sort (string-downcase word) #'char<)
         do (multiple-value-bind (k p) (gethash normal agram-t)
              (declare (ignorable k))
              (if p
@@ -99,13 +98,13 @@ is filled."
 
 ;;; return the largest anagram set in our data
 (defun largest-anagram-set (&optional (anagrams *anagrams*))
-  "return the largest set of anagrams in the hashtable passed in as 'anagrams."
+  "return the largest set of anagrams in the hashtable passed in as :anagrams."
   (let* ((anas (return-valid-anagrams anagrams))
          (maxlen (loop for x in anas maximize (list-length x))))
     (find maxlen anas :key #'list-length :test 'equalp)))
 
 (defun anagram-frequencies-for-n (n anagrams)
-  ""
+  "return "
   (let* ((anas (return-valid-anagrams anagrams)))
     (loop for x in anas
           when (= (length x) n)
